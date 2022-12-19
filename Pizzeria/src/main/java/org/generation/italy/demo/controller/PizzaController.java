@@ -33,8 +33,24 @@ public class PizzaController {
 		model.addAttribute("pizzas", pizzas);
 		return "index";
 	}
+	
+	@GetMapping("/pizza/{id}")
+	public String getPizza(@PathVariable("id") int id, Model model) {
+		
+		Optional<Pizza> optPizza = pizzaService.findPizzaById(id);
+		
+		if(optPizza.isEmpty()) {
+			System.err.println("Pizza non presente con id: " + id);
+		}
+		
+		Pizza pizza = optPizza.get();
+		
+		model.addAttribute("pizza", pizza);
+		
+		return "pizza";
+	}
 
-	@GetMapping("/create")
+	@GetMapping("/pizza/create")
 	public String createPizza(Model model) {
 		Pizza pizza = new Pizza();
 		model.addAttribute("pizza", pizza);
@@ -42,7 +58,7 @@ public class PizzaController {
 		return "pizza-create";
 	}
 
-	@PostMapping("/create")
+	@PostMapping("/pizza/create")
 	public String storePizza(@Valid @ModelAttribute("pizza") Pizza pizza, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
 		if(bindingResult.hasErrors()) {
@@ -51,10 +67,10 @@ public class PizzaController {
 		}
 
 		pizzaService.save(pizza);
-		return "redirect:/pizza";
+		return "redirect:/";
 	}
 
-	@GetMapping("/edit/{id}")
+	@GetMapping("/pizza/edit/{id}")
 	public String editPizza(@PathVariable("id") int id, Model model) {
 
 		Optional<Pizza> optPizza = pizzaService.findPizzaById(id);
@@ -65,24 +81,24 @@ public class PizzaController {
 		return "pizza-edit";
 	}
 
-	@PostMapping("/edit")
+	@PostMapping("/pizza/store")
 	public String updatePizza(@Valid @ModelAttribute("pizza") Pizza pizza, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
 		if(bindingResult.hasErrors()) {
 			redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors());
-			return "redirect:/edit/" + pizza.getId();
+			return "redirect:/pizza/edit/" + pizza.getId();
 		}
 
 		pizzaService.save(pizza);
-		return "redirect:/pizza";
+		return "redirect:/";
 	}
 
-	@GetMapping("/delete/{id}")
+	@GetMapping("/pizza/delete/{id}")
 	public String deletePizza(@PathVariable("id") int id) {
 
 		pizzaService.deleteById(id);
 
-		return "redirect:/index";
+		return "redirect:/";
 	}
 
 	@GetMapping("/search")
